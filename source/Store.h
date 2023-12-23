@@ -14,9 +14,10 @@ struct SalesRecord {
 // 结构定义：产品
 struct Product {
     std::string name;
+    std::string category;
     int id;
     std::time_t purchaseDate;
-    int quantity;
+    int quantity; 
     std::vector<SalesRecord> salesRecords;
 
     // 左右子节点指针
@@ -24,8 +25,8 @@ struct Product {
     Product* right;
 
     // 构造函数，用于创建产品对象
-    Product(const std::string& productName = "defualt name", int productId = 0, std::time_t purchaseDt = std::time_t(nullptr), int productQty = 0)
-        : name(productName), id(productId), purchaseDate(purchaseDt), quantity(productQty), left(nullptr), right(nullptr) {}
+    Product(const std::string& productName = "defualt name", const std::string& productcategory = "defualt category", int productId = 0, std::time_t purchaseDt = std::time_t(nullptr), int productQty = 0)
+        : name(productName), category(productcategory), id(productId), purchaseDate(purchaseDt), quantity(productQty), left(nullptr), right(nullptr) {}
     
     ~Product() {
     salesRecords.clear();  // 清空销售记录
@@ -56,6 +57,10 @@ public:
         for(int i = 1; i <= maxProductId; i++)
             displayProductInfo(i);
     }
+    // 显示产品列表
+    void displayCategoryList() const;
+    // 显示特定产品类别的所有产品
+    void displayAimCategoryProduct(std::string aim);
     // 将产品信息保存到文件
     void saveProductsToFile(const std::string& filename) const;
     // 从文件中加载产品信息
@@ -64,6 +69,7 @@ public:
 private:
     Product* root;  // 根节点指针
     int maxProductId;  // 最大产品ID
+    std::vector<std::string> category_list; // 产品种类类别
 
     // 插入产品节点
     Product* insert(Product* node, const Product& product);
@@ -71,4 +77,8 @@ private:
     Product* search(Product* node, int productId) const;
     // 将产品信息保存到文件
     void saveToFile(Product* node, std::ofstream& file) const;
+    // 更新产品类别列表
+    void update_categorylist(Product * node);
+    // 搜索特定类别产品的id
+    void find_categorylist(Product * node, std::string aim);
 };

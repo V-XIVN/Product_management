@@ -1,10 +1,12 @@
 #include "Store.h"
+static std::vector<int> aim_list;
 
 void Store::addProduct(const Product& product)
 {
     // 更新最大产品ID
     maxProductId = std::max(maxProductId, product.id);
     root = insert(root, product);
+    update_categorylist(root);
 }
 
 void Store::addSale(int productId, int quantity) 
@@ -13,7 +15,7 @@ void Store::addSale(int productId, int quantity)
     if (product) {
         SalesRecord record{quantity, std::time(nullptr)};
         product->salesRecords.push_back(record);
-        product->quantity -= quantity;
+        product->quantity += quantity;
     } else {
         std::cerr << "未找到产品编号为 " << productId << " 的产品。\n";
     }
@@ -24,13 +26,17 @@ void Store::displayProductInfo(int productId) const
     Product* product = search(root, productId);
     if (product) {
         std::cout << "产品名称: " << product->name << "\n";
+        std::cout << "产品类别: " << product->category << "\n";
         std::cout << "产品编号: " << product->id << "\n";
         std::cout << "总数量: " << product->quantity << "\n";
         std::cout << "进货日期: " << std::ctime(&product->purchaseDate);
         std::cout << "销售记录:\n";
         for (const auto& record : product->salesRecords) 
         {
-            std::cout << "售出数量: " << record.soldQuantity << ", 销售时间: " << std::ctime(&record.saleTime);
+            if(record.soldQuantity < 0)
+                std::cout << "售出数量: " << -record.soldQuantity << ", 销售时间: " << std::ctime(&record.saleTime);
+            else if(record.soldQuantity > 0)
+                std::cout << "进货数量: " << record.soldQuantity << ", 进货时间: " << std::ctime(&record.saleTime);
         }
         std::cout << "----------------------------------" << std::endl;
     } else {
@@ -53,9 +59,30 @@ void Store::loadProductsFromFile(const std::string& filename) {
     std::ifstream file(filename);
     if (file.is_open()) {
         Product product;
+        /*
         while (file >> product.name >> product.id >> product.purchaseDate >> product.quantity) {
             addProduct(product);
         }
+        */
+        // 测试加入产品销售记录之后的读取与保存
+        int size, salequatity;
+        std::time_t sale_time;
+        SalesRecord sales;
+
+        while (file >> product.name >> product.category >> product.id >> product.purchaseDate >> product.quantity)
+        {
+            file >> size;
+            if(size != 0)
+                for(int j = 0; j < size; j++)
+                {
+                    file >> salequatity >> sale_time;
+                    sales.soldQuantity = salequatity;
+                    sales.saleTime = sale_time;
+                    product.salesRecords.push_back(sales);
+                }
+            addProduct(product);
+        }
+        update_categorylist(root);
     } else {
         std::cerr << "无法打开文件: " << filename << "\n";
     }
@@ -105,7 +132,12 @@ void Store::saveToFile(Product* node, std::ofstream& file) const
 {
     if (node != nullptr) {
         saveToFile(node->left, file);
-        file << node->name << ' ' << node->id << ' ' << node->purchaseDate << ' ' << node->quantity << '\n';
+        // file << node->name << ' ' << node->id << ' ' << node->purchaseDate << ' ' << node->quantity << '\n';
+        // 测试写入销售数据，销售数据格式跟在产品数据后，先写入销售记录的总数，然后写入销售记录的数量和时间
+        file << node->name << ' ' << node->category << ' ' << node->id << ' ' << node->purchaseDate << ' ' << node->quantity << ' ' << node->salesRecords.size();
+        for(SalesRecord i : node->salesRecords)
+            file << ' ' << i.soldQuantity << ' ' << i.saleTime;
+        file << '\n';
         saveToFile(node->right, file);
     }
  }
@@ -149,6 +181,7 @@ std::vector<int> Store::findMissingProductIds() const
 void Store::deleteProduct(int productId)
 {
     root = deleteProductHelper(root, productId);
+    update_categorylist(root);
 }
 
 Product* Store::deleteProductHelper(Product* node, int productId)
@@ -209,4 +242,70 @@ Product* Store::findMin(Product* node)
         node = node->left;
     }
     return node;
+}
+
+void Store::update_categorylist(Product * node)
+{ 
+    if(node == root)
+        category_list.clear();
+    bool is_exist = true;
+    for(std::string i : category_list)
+    {
+        if (i == node->category)
+            is_exist = false;
+    }
+    if(is_exist)
+        category_list.push_back(node->category);
+    
+
+    if (node->left) {
+            return update_categorylist(node->left);
+    } 
+    else if(node->right) 
+    {
+            return update_categorylist(node->right);
+    }
+    else
+    {
+        return;
+    }
+}
+
+void Store::displayCategoryList() const
+{
+    for(std::string i : category_list)
+        std::cout << i << ' ';
+    std::cout << std::endl; 
+    return;
+}
+
+void Store::find_categorylist(Product * node, std::string aim)
+{
+    if (node == root)
+        aim_list.clear();
+    if(node->category == aim)
+        aim_list.push_back(node->id);
+    
+
+    if (node->left) {
+        return find_categorylist(node->left, aim);
+    } 
+    else if(node->right) 
+    {
+        return find_categorylist(node->right, aim);
+    }
+    else
+    {
+        return;
+    }
+}
+
+void Store::displayAimCategoryProduct(std::string aim)
+{
+    find_categorylist(root, aim);
+    for(auto i : aim_list)
+    {
+        displayProductInfo(i);
+    }
+
 }
