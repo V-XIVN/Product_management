@@ -71,6 +71,7 @@ void Store::loadProductsFromFile(const std::string& filename) {
 
         while (file >> product.name >> product.category >> product.id >> product.purchaseDate >> product.quantity)
         {
+            product.salesRecords.clear();
             file >> size;
             if(size != 0)
                 for(int j = 0; j < size; j++)
@@ -128,7 +129,7 @@ Product* Store::search(Product* node, int productId) const
     }
 }
 
-void Store::saveToFile(Product* node, std::ofstream& file) const 
+ void Store::saveToFile(Product* node, std::ofstream& file) const 
 {
     if (node != nullptr) {
         saveToFile(node->left, file);

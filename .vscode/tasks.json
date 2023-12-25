@@ -10,7 +10,7 @@
                 "${workspaceFolder}\\source\\main.cpp",
                 "${workspaceFolder}\\source\\Store.cpp",
                 "-o",
-                "${workspaceFolder}\\debug\\${fileBasenameNoExtension}.exe",
+                "${workspaceFolder}\\debug\\ManagementSystem.exe",
                 "-fexec-charset=GBK",
                 "-finput-charset=UTF-8",
                 "-lstdc++"
