@@ -30,8 +30,11 @@ int main() {
             break;
         }
     }
-
-    if (currentUser->hasAdminPermissions() == true) {
+    if (currentUser == nullptr){
+        std::cout << "登录失败，密码或账号错误!\n";
+        system("pause");
+    }
+    else if (currentUser->hasAdminPermissions() == true) {
         std::cout << "管理员登录成功！\n";
 
         Store store;
@@ -91,6 +94,8 @@ int main() {
                     std::cout << "输入产品数量:";
                     std::cin >> quantity;
                     store.addProduct(Product {name, category, number, std::time(nullptr), quantity});
+                    store.saveProductsToFile("products.txt");
+                    store.loadProductsFromFile("products.txt");
                     continue;
                 case 4: // 添加变动记录 
                     std::cout << "请输入要添加的货物变动记录的产品编号，以及它的变动数量(大于0为进货，小于0为销售):";
@@ -101,6 +106,8 @@ int main() {
                     std::cout << "请输入将要删除的产品编号";
                     std::cin >> number;
                     store.deleteProduct(number);
+                    store.saveProductsToFile("products.txt");
+                    store.loadProductsFromFile("products.txt");
                     continue;
                 case 6: // 查询某一产品类别的所有产品
                     std::cout << "当前存在的所有类别为: ";
@@ -156,10 +163,6 @@ int main() {
                     continue;
             }
         }while(select != 0);
-    }
-    else {
-        std::cout << "登录失败，密码或账号错误!\n";
-        system("pause");
     }
 
     return 0;

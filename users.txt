@@ -1,2 +1,3 @@
 admin adminpassword 1
+control controlpassword 1
 user userpassword 0
