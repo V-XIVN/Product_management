@@ -132,6 +132,7 @@ int main() {
         std::cout << "用户登录成功!";
         Store store;
         int select;
+        std::string category;
 
         // 检查产品信息文件是否存在
         std::ifstream productFile("products.txt");
@@ -161,8 +162,16 @@ int main() {
                     std::cin >> i;
                     store.displayProductInfo(i);
                     continue;
+                case 3: // 查询某一产品类别的所有产品
+                    std::cout << "当前存在的所有类别为: ";
+                    store.displayCategoryList();
+                    std::cout << "请输入你想要查找的类别： ";
+                    std::cin >> category;
+                    store.displayAimCategoryProduct(category);
+                    continue;
             }
         }while(select != 0);
+        system("pause");
     }
 
     return 0;
@@ -206,6 +215,8 @@ void menuforuser()
     cout << "1. 显示所有产品信息";
     cout.width(25);
     cout << "2. 显示特定编号的产品信息" << endl;
+    cout.width(25);
+    cout << "3. 查询某一产品类别的所有产品" << endl;
 
     return;
 }

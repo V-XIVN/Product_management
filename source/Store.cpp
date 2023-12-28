@@ -59,12 +59,7 @@ void Store::loadProductsFromFile(const std::string& filename) {
     std::ifstream file(filename);
     if (file.is_open()) {
         Product product;
-        /*
-        while (file >> product.name >> product.id >> product.purchaseDate >> product.quantity) {
-            addProduct(product);
-        }
-        */
-        // 测试加入产品销售记录之后的读取与保存
+        // 加入产品销售记录之后的读取与保存
         int size, salequatity;
         std::time_t sale_time;
         SalesRecord sales;
@@ -133,7 +128,6 @@ Product* Store::search(Product* node, int productId) const
 {
     if (node != nullptr) {
         saveToFile(node->left, file);
-        // file << node->name << ' ' << node->id << ' ' << node->purchaseDate << ' ' << node->quantity << '\n';
         // 测试写入销售数据，销售数据格式跟在产品数据后，先写入销售记录的总数，然后写入销售记录的数量和时间
         file << node->name << ' ' << node->category << ' ' << node->id << ' ' << node->purchaseDate << ' ' << node->quantity << ' ' << node->salesRecords.size();
         for(SalesRecord i : node->salesRecords)
